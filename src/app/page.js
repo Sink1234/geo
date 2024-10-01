@@ -1,95 +1,70 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client';
+import { useState } from 'react';
 
-export default function Home() {
+export default function PointsInput() {
+  // Высоты по умолчанию
+  const defaultHeights = [
+    [32.97, 29.93, 32.03, 30.84],
+    [31.60, 29.93, 32.97, 30.84],
+    [30.84, 31.60, 32.03, 31.98],
+    [31.98, 32.97, 29.93, 31.60]
+  ];
+
+  // Используем состояние для высот
+  const [heights, setHeights] = useState(defaultHeights);
+
+  // Обработчик для изменения значений
+  const handleInputChange = (i, j, value) => {
+    const newHeights = [...heights];
+    newHeights[i][j] = parseFloat(value);
+    setHeights(newHeights);
+  };
+
+  // Отправка данных в API
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ heights }),
+      });
+
+      if (response.ok) {
+        alert('Результаты отправлены в Telegram!');
+      } else {
+        alert('Ошибка при отправке данных');
+      }
+    } catch (error) {
+      alert('Произошла ошибка: ' + error.message);
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    <form onSubmit={handleSubmit}> 
+      <table>
+        <tbody>
+          {heights.map((row, i) => (
+            <tr key={i}>
+              {row.map((height, j) => (
+                <td key={j}>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={height}
+                    onChange={(e) => handleInputChange(i, j, e.target.value)}
+                    style={{ width: '60px' }}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button type="submit">Отправить</button>
+    </form>
+  );
 }
