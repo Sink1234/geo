@@ -99,9 +99,7 @@ export async function POST(req) {
         }
       });
     });
-
-    // Сохранение результатов в файл
-    fs.writeFileSync('public/water_levels.json', JSON.stringify(jsonOutput, null, 2));
+ 
 
     // Отправляем координаты точек в Telegram
     const telegramToken = '7262582449:AAHsyNFn9XFbrSNH4rh2wGDxoxqm4ZQoOt4';
